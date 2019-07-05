@@ -1,0 +1,43 @@
+import { NextFC, NextContext } from 'next'
+
+interface OwnProps { }
+interface InitialProps {
+  statusCode: number
+  namespacesRequired: string[]
+}
+interface Context extends NextContext { }
+
+type ErrorScreenProps = OwnProps & InitialProps
+
+const ErrorScreen: NextFC<ErrorScreenProps, InitialProps, Context> = props => {
+  const { statusCode } = props
+
+  return (
+    <p>
+      {statusCode
+        ? `An error ${statusCode} occurred on server`
+        : 'An error occurred on client'}
+    </p>
+  )
+}
+
+ErrorScreen.getInitialProps = async context => {
+  const { res, err } = context
+
+  let statusCode = 0
+  if (res) {
+    statusCode = res.statusCode
+  } else if (err) {
+    const e = err as any
+    if (e.statusCode) {
+      statusCode = e.statusCode
+    }
+  }
+
+  return {
+    statusCode,
+    namespacesRequired: ['common']
+  }
+}
+
+export default ErrorScreen
